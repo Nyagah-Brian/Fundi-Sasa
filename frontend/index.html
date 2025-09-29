@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fundi Sasa</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header>
+    <h1>Fundi Sasa</h1>
+    <p class="subtitle">What help do you need today?</p>
+</header>
+
+<div class="container">
+    <!-- Skill input -->
+    <div class="search-container">
+        <input type="text" id="skill-input" placeholder="What help do you need?">
+        <button id="search-btn">Search</button>
+    </div>
+
+    <!-- Services as cards -->
+    <ul id="services" class="services-list">
+        <!-- dynamically inserted -->
+    </ul>
+</div>
+
+<!-- Location Modal -->
+<div id="location-modal" class="modal">
+    <div class="modal-content">
+        <h2>Enter Your Location</h2>
+        <input type="text" id="modal-location" placeholder="Your location">
+        <button id="my-location-btn">Use My Location</button>
+        <div class="modal-buttons">
+            <button id="confirm-location">Confirm</button>
+            <button id="cancel-location">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script src="./js/app.js"></script>
+</body>
+</html>
