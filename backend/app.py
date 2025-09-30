@@ -1,6 +1,10 @@
-from flask import Flask, jsonify, request
+# backend/app.py
+from flask import Flask, jsonify
 from flask_cors import CORS
-from db_connection import get_connection  # your MySQL connection
+
+# Import blueprints
+from routes.technician import technician_bp
+from routes.auth import auth_bp   # we will implement auth routes soon
 
 app = Flask(__name__)
 CORS(app)
@@ -9,52 +13,9 @@ CORS(app)
 def home():
     return jsonify({"message": "Fundi Sasa backend is running!"})
 
-@app.route('/technicians', methods=['GET'])
-def get_technicians():
-    conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM technicians")
-    rows = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return jsonify({"technicians": rows})
-
-@app.route('/technicians/recommend', methods=['GET'])
-def recommend_technicians():
-    """
-    Recommendation based on skill (partial match), rating, experience, price
-    """
-    skill_query = request.args.get('skill', '').strip().lower()
-    max_price = float(request.args.get('max_price', 1000))
-    location_query = request.args.get('location', '').strip().lower()
-
-    conn = get_connection()
-    cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM technicians")
-    technicians = cursor.fetchall()
-    cursor.close()
-    conn.close()
-
-    results = []
-    for tech in technicians:
-        skills = [s.strip().lower() for s in tech['skills'].split(',')]
-        if skill_query and not any(skill_query in s for s in skills):
-            continue
-        if tech['price_rate'] > max_price:
-            continue
-        if location_query and location_query not in tech['location'].lower():
-            continue
-
-        # Simple scoring
-        rating_score = tech['avg_rating'] / 5
-        exp_score = min(tech['experience_years'] / 20, 1)
-        price_score = max(0, 1 - (tech['price_rate']/50))
-        tech['score'] = round(0.4 + rating_score*0.3 + exp_score*0.2 + price_score*0.1, 2)
-
-        results.append(tech)
-
-    results.sort(key=lambda x: x['score'], reverse=True)
-    return jsonify({"recommendations": results[:10]})  # top 10
+# Register blueprints
+app.register_blueprint(technician_bp, url_prefix="/technicians")
+app.register_blueprint(auth_bp, url_prefix="/auth")
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
